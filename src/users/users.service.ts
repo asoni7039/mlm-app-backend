@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -6,6 +6,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ReferralCode } from '../referral/entities/referral-code.entity';
 import { MESSAGES } from '../constants/messages';
+import { AuthService } from '../auth/auth.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -15,7 +16,21 @@ export class UsersService {
     private usersRepository: Repository<User>,
     @InjectRepository(ReferralCode)
     private referralCodeRepository: Repository<ReferralCode>,
+    private authService: AuthService,
   ) {}
+
+  async findById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({ 
+      where: { id },
+      select: ['id', 'email', 'fullName', 'mobile'] 
+    });
+    
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER.NOT_FOUND);
+    }
+    
+    return user;
+  }
 
   async register(registerDto: RegisterDto) {
     // Check for duplicate email
@@ -79,28 +94,30 @@ export class UsersService {
   }
 
   async login(loginDto: LoginDto) {
-    // Find user by email
     const user = await this.usersRepository.findOne({
       where: { email: loginDto.email },
-      select: ['id', 'email', 'password', 'fullName', 'mobile'], // Explicitly select password field
+      select: ['id', 'email', 'password', 'fullName', 'mobile'],
     });
 
     if (!user) {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
-    // Verify password
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException(MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
+
+    // Generate JWT token
+    const token = await this.authService.generateToken(user);
 
     // Remove password from response
     const { password, ...result } = user;
     
     return {
       message: MESSAGES.AUTH.LOGIN_SUCCESS,
-      user: result
+      user: result,
+      ...token
     };
   }
 } 

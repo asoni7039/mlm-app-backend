@@ -2,11 +2,13 @@ export const MESSAGES = {
   AUTH: {
     INVALID_CREDENTIALS: 'Invalid email or password',
     LOGIN_SUCCESS: 'Login successful',
+    UNAUTHORIZED: 'Unauthorized access',
   },
   USER: {
     REGISTER_SUCCESS: 'User successfully registered',
     EMAIL_EXISTS: 'Email already exists',
     MOBILE_EXISTS: 'Mobile number already exists',
+    NOT_FOUND: 'User not found',
   },
   REFERRAL: {
     INVALID_CODE: 'Invalid or inactive referral code',
