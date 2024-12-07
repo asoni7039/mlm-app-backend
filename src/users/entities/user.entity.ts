@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { ReferralCode } from '../../referral/entities/referral-code.entity';
 
 @Entity('user')
 export class User {
@@ -17,8 +18,12 @@ export class User {
   @Column({ length: 255 })
   password: string;
 
-  @Column({ name: 'referral_code', length: 20, nullable: true })
-  referralCode: string;
+  @ManyToOne(() => ReferralCode)
+  @JoinColumn({ name: 'referral_code_id' })
+  referralCode: ReferralCode;
+
+  @Column({ name: 'referral_code_id', nullable: true })
+  referralCodeId: number;
 
   @Column({ type: 'text', nullable: true })
   address: string;

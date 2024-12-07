@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfig } from './config/database.config';
 import { UsersModule } from './users/users.module';
+import { ReferralModule } from './referral/referral.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 
@@ -9,6 +10,7 @@ import { ValidationPipe } from '@nestjs/common';
   imports: [
     TypeOrmModule.forRoot(databaseConfig),
     UsersModule,
+    ReferralModule,
   ],
   providers: [
     {

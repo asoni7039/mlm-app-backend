@@ -2,6 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './users/entities/user.entity';
+import { MESSAGES } from './constants/messages';
 
 @Controller()
 export class AppController {
@@ -14,9 +15,12 @@ export class AppController {
   async testDB() {
     try {
       await this.usersRepository.find();
-      return { message: 'Database connection is working!!' };
+      return { message: MESSAGES.DATABASE.CONNECTION_SUCCESS };
     } catch (error) {
-      return { error: 'Database connection failed', details: error.message };
+      return { 
+        error: MESSAGES.DATABASE.CONNECTION_FAILED, 
+        details: error.message 
+      };
     }
   }
 }
