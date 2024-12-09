@@ -1,5 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 
+export enum ReferralType {
+  DOWNLINE = 'DOWNLINE',
+  REGISTRATION = 'REGISTRATION'
+}
+
 @Entity('referral_codes')
 export class ReferralCode {
   @PrimaryGeneratedColumn()
@@ -7,6 +12,20 @@ export class ReferralCode {
 
   @Column({ unique: true })
   code: string;
+
+  @Column({
+    type: 'enum',
+    enum: ReferralType,
+    default: ReferralType.REGISTRATION
+  })
+  type: ReferralType;
+
+  @Column('decimal', { 
+    precision: 5, 
+    scale: 2,
+    default: 1.0 
+  })
+  rewardMultiplier: number;
 
   @Column({ name: 'is_active', default: true })
   isActive: boolean;

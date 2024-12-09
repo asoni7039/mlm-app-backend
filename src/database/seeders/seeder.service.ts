@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ReferralCode } from '../../referral/entities/referral-code.entity';
+import { ReferralCode, ReferralType } from '../../referral/entities/referral-code.entity';
 
 @Injectable()
 export class SeederService {
@@ -14,36 +14,37 @@ export class SeederService {
     const referralCodes = [
       {
         code: 'WELCOME2024',
+        type: ReferralType.REGISTRATION,
+        rewardMultiplier: 1.0,
+        description: 'Registration referral code with 1x reward',
         isActive: true,
-        description: 'Welcome offer for 2024',
         createdBy: 1,
         updatedBy: 1,
       },
       {
-        code: 'NEWUSER50',
+        code: 'DOWNLINE50',
+        type: ReferralType.DOWNLINE,
+        rewardMultiplier: 2.0,
+        description: 'Downline referral code with 2x reward',
         isActive: true,
-        description: 'New user discount code',
         createdBy: 1,
         updatedBy: 1,
       },
       {
         code: 'SPECIAL25',
+        type: ReferralType.REGISTRATION,
+        rewardMultiplier: 1.0,
+        description: 'Special registration code with 1x reward',
         isActive: true,
-        description: 'Special discount code',
         createdBy: 1,
         updatedBy: 1,
       },
       {
-        code: 'FRIEND100',
+        code: 'TEAM100',
+        type: ReferralType.DOWNLINE,
+        rewardMultiplier: 2.0,
+        description: 'Team downline code with 2x reward',
         isActive: true,
-        description: 'Friend referral bonus',
-        createdBy: 1,
-        updatedBy: 1,
-      },
-      {
-        code: 'VIP2024',
-        isActive: true,
-        description: 'VIP member code',
         createdBy: 1,
         updatedBy: 1,
       },

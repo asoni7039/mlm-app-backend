@@ -9,6 +9,8 @@ export const MESSAGES = {
     EMAIL_EXISTS: 'Email already exists',
     MOBILE_EXISTS: 'Mobile number already exists',
     NOT_FOUND: 'User not found',
+    PROFILE_RETRIEVED: 'Profile retrieved successfully',
+    DASHBOARD_SUCCESS: 'Dashboard data retrieved successfully',
   },
   REFERRAL: {
     INVALID_CODE: 'Invalid or inactive referral code',

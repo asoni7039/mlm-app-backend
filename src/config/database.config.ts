@@ -1,13 +1,12 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { registerAs } from '@nestjs/config';
 
-export const databaseConfig: TypeOrmModuleOptions = {
+export const databaseConfig = registerAs('database', () => ({
   type: 'mysql',
-  host: 'localhost',
-  port: 3306,
-  username: 'root',
-  password: '',
-  database: 'mlm_app',
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: true, // Set to false in production
-  logging: true, // You can set this to false later
-}; 
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 3306,
+  username: process.env.DB_USERNAME || 'root',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  entities: ['dist/**/*.entity{.ts,.js}'],
+  synchronize: process.env.NODE_ENV !== 'production',
+})); 

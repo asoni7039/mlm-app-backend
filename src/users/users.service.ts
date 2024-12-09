@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -8,6 +8,8 @@ import { ReferralCode } from '../referral/entities/referral-code.entity';
 import { MESSAGES } from '../constants/messages';
 import { AuthService } from '../auth/auth.service';
 import * as bcrypt from 'bcrypt';
+import { Reward } from '../rewards/entities/reward.entity';
+import { ReferralType } from '../referral/entities/referral-code.entity';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +18,10 @@ export class UsersService {
     private usersRepository: Repository<User>,
     @InjectRepository(ReferralCode)
     private referralCodeRepository: Repository<ReferralCode>,
+    @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
+    @InjectRepository(Reward)
+    private rewardsRepository: Repository<Reward>,
   ) {}
 
   async findById(id: number): Promise<User> {
@@ -118,6 +123,50 @@ export class UsersService {
       message: MESSAGES.AUTH.LOGIN_SUCCESS,
       user: result,
       ...token
+    };
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return this.usersRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'password', 'fullName', 'mobile'], // Include password for validation
+    });
+  }
+
+  async getDashboardData(userId: number) {
+    // Get all rewards for the user
+    const rewards = await this.rewardsRepository.find({
+      where: { userId },
+      relations: ['referralCode'],
+      order: { createdAt: 'DESC' },
+    });
+
+    // Calculate totals
+    const totalPoints = rewards.reduce((sum, reward) => sum + Number(reward.points), 0);
+    
+    const downlineReferralPoints = rewards
+      .filter(reward => reward.type === ReferralType.DOWNLINE)
+      .reduce((sum, reward) => sum + Number(reward.points), 0);
+    
+    const registrationReferralPoints = rewards
+      .filter(reward => reward.type === ReferralType.REGISTRATION)
+      .reduce((sum, reward) => sum + Number(reward.points), 0);
+
+    // Get recent rewards (last 5)
+    const recentRewards = rewards.slice(0, 5).map(reward => ({
+      points: Number(reward.points),
+      type: reward.type,
+      createdAt: reward.createdAt,
+    }));
+
+    return {
+      message: MESSAGES.USER.DASHBOARD_SUCCESS,
+      data: {
+        totalPoints,
+        downlineReferralPoints,
+        registrationReferralPoints,
+        recentRewards,
+      }
     };
   }
 } 
